@@ -75,6 +75,7 @@ def create_coordinates(image, line_parameters):
 def average_slope_intercept(image, lines):
     """
     Averages the detected line segments to find the single left and right lane lines.
+    This version is robust against frames where no lines are detected for a lane.
 
     Args:
         image: The original image.
@@ -86,6 +87,9 @@ def average_slope_intercept(image, lines):
     left_fit = []
     right_fit = []
     
+    if lines is None:
+        return None
+
     for line in lines:
         x1, y1, x2, y2 = line.reshape(4)
         
@@ -100,15 +104,20 @@ def average_slope_intercept(image, lines):
         else:
             right_fit.append((slope, intercept))
             
-    # Average the slopes and intercepts for each side
-    left_fit_average = np.average(left_fit, axis=0)
-    right_fit_average = np.average(right_fit, axis=0)
+    averaged_lines = []
+    # Check if any lines were found for the left lane before averaging
+    if left_fit:
+        left_fit_average = np.average(left_fit, axis=0)
+        left_line = create_coordinates(image, left_fit_average)
+        averaged_lines.append(left_line)
+        
+    # Check if any lines were found for the right lane before averaging
+    if right_fit:
+        right_fit_average = np.average(right_fit, axis=0)
+        right_line = create_coordinates(image, right_fit_average)
+        averaged_lines.append(right_line)
     
-    # Calculate the coordinates for the left and right lines
-    left_line = create_coordinates(image, left_fit_average)
-    right_line = create_coordinates(image, right_fit_average)
-    
-    return np.array([left_line, right_line])
+    return np.array(averaged_lines)
 
 
 def display_lines(image, lines):

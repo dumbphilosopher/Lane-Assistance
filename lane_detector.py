@@ -83,9 +83,6 @@ def display_lines(image, lines):
     line_image = np.zeros_like(image)
     if lines is not None:
         for x1, y1, x2, y2 in lines:
-            # --- THIS IS THE NEW DEBUG LINE ---
-            print(f"Drawing line with coords: [{x1}, {y1}, {x2}, {y2}] and types: [{type(x1)}, {type(y1)}, {type(x2)}, {type(y2)}]")
-            
             cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 10)
     return line_image
 
